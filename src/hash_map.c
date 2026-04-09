@@ -2,19 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "basic_types.h"
-struct string{
-  int size;
-  char *value;
-};
-struct node{
-  String key;
-  String value;
-  Node *next;
-};
-struct hash_map{
-  int size;
-  Node **buckets;
-};
 HashMap * initialize_hashmap(){
     HashMap *h_m = malloc(sizeof(HashMap));
     if(!h_m){
@@ -38,6 +25,8 @@ void destroy_hash_map(HashMap * h_m){
         while (current) {
             Node *temp = current;
             current = current->next;
+            free(temp->key.value);
+            free(temp->value.value);
             free(temp);
         }
     }
@@ -59,7 +48,7 @@ bool hash_map_get(HashMap *h_map, char *result, const char *key){
     Node* bucket = h_map->buckets[hash];
     while(bucket){
         if(strcmp(bucket->key.value,key)==0){
-            strcpy(result, bucket->value.value);
+            strncpy(result, bucket->value.value,bucket->value.size+1);
             return true;
         }
         bucket = bucket->next;
@@ -71,8 +60,13 @@ bool hash_map_set(HashMap *h_map, const char *key, const char *value){
     if(!h_map) return false;
     int hash = hash_function(h_map->size, key);  // need to implement hash function
     Node* bucket = h_map->buckets[hash];
-    String key_string = {strlen(key),(char *)key};
-    String key_value = {strlen(value),(char *)value};
+    char *key_copy = strdup(key);
+    char *value_copy = strdup(value);
+    if(!key_copy||!value_copy){
+        return false;
+    }
+    String key_string = {strlen(key_copy),key_copy};
+    String key_value = {strlen(value_copy),value_copy};
     Node *new_node = malloc(sizeof(struct node));
     if(!new_node){
         return false;
@@ -83,7 +77,11 @@ bool hash_map_set(HashMap *h_map, const char *key, const char *value){
     if(bucket){
         while (bucket) {
             if (strcmp(bucket->key.value, key) == 0) {
-                bucket->value = key_value;
+                free(bucket->value.value);
+                char* value_copy = strdup(value);
+                if(!value_copy) return false;
+                bucket->value.value = value_copy;
+                bucket->value.size = strlen(value_copy);
                 return true;
             }
             if (bucket->next == NULL) break;
