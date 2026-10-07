@@ -14,30 +14,24 @@ BINDIR   := bin
 SRCS        := $(wildcard $(SRCDIR)/*.c)
 
 SERVER_SRC  := $(SRCDIR)/server.c
-CLIENT_SRC  := $(SRCDIR)/client.c
 
 # Exclude server.c and client.c from common sources
-COMMON_SRCS := $(filter-out $(SERVER_SRC) $(CLIENT_SRC), $(SRCS))
+COMMON_SRCS := $(filter-out $(SERVER_SRC) , $(SRCS))
 
 # Object files
 COMMON_OBJS := $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(COMMON_SRCS))
 SERVER_OBJ  := $(OBJDIR)/server.o
-CLIENT_OBJ  := $(OBJDIR)/client.o
 
 # Targets
 SERVER := $(BINDIR)/server
-CLIENT := $(BINDIR)/client
 
 # 4. Build Rules
-all: $(SERVER) $(CLIENT)
+all: $(SERVER) 
 
 # Link server
 $(SERVER): $(SERVER_OBJ) $(COMMON_OBJS) | $(BINDIR)
 	$(CC) $(CFLAGS) -o $@ $^
 
-# Link client
-$(CLIENT): $(CLIENT_OBJ) $(COMMON_OBJS) | $(BINDIR)
-	$(CC) $(CFLAGS) -o $@ $^
 
 # Compile
 $(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR)

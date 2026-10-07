@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <signal.h>
+#include "generic_file_operations.h"
 #include "hash_map.h"
 #include "file_operation.h"
 
@@ -18,7 +19,6 @@ typedef struct thread_input THREAD_INPUT ;
 void handle_sigint(int sig){
     printf("Server is shutting down ...");
     close(socket_d);
-    file_write(hash_map, "data/data.bin");
     exit(0);
 }
 void* client_handler(void* client_fd);
