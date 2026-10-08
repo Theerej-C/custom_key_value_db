@@ -1,5 +1,6 @@
 #include <netinet/in.h>
 #include <stdio.h>
+#include <string.h>
 #include <sys/socket.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -33,7 +34,7 @@ int main(){
 
     struct sockaddr_in sock_addr = {0};  // FIX
 
-    sock_addr.sin_port = htons(9090);
+    sock_addr.sin_port = htons(9000);
     sock_addr.sin_family = AF_INET;
     sock_addr.sin_addr.s_addr = INADDR_ANY;
 
@@ -70,9 +71,19 @@ void* client_handler(void* t_i){
         if(bytes <= 0){
             break;
         }
-
+        
         recv_message[bytes] = '\0'; // FIX
-        hash_map_set(thread_i->hash_map, recv_message, recv_message);
+        printf("Received from the client: %s\n", recv_message);
+        char* token = strtok(recv_message, ":");
+        char* key = token;
+        printf("Key Received from the client: %s\n", key);
+        token = strtok(NULL,":");
+        char* val = token;
+        printf("Value Received from the client: %s\n", val);
+        hash_map_set(thread_i->hash_map, key, val);
+        String key_string = {sizeof(key),key}; 
+        String val_string = {sizeof(val),val}; 
+        file_write_for_specific_key(key_string, val_string);
         printf("Received from the client: %s\n", recv_message);
     }
     close(thread_i->client_fd);

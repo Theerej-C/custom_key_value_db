@@ -31,10 +31,8 @@ int file_read_for_specific_key(String key, String *value_return){
 int file_write_for_specific_key(String key, String value_inp){
     FILE* file;
     file = fopen("db.txt", "a");
-    char* final_out = key.value;
-    strcat(final_out," ");
-    strcat(final_out, value_inp.value);
-    fprintf(file, "%s",final_out); 
+    fprintf(file, "%s %s \n",key.value,value_inp.value); 
+    fclose(file);
     return 0;
 
 } 
